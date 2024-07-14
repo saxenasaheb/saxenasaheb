@@ -1,8 +1,7 @@
-- 👋 Hi, I’m @saxenasaheb
-- 👀 I’m interested in contributing to the decentralized web
-- 🌱 I’m currently learning how to navigate github
-- 💞️ I’m looking to collaborate on building a data analytics platform 
-- 📫 You can reach me @saxenasaheb on twitter
+Founder, builder, and community champion.
+Obsessed with new models of global human coordination.
+
+Most active on Farcaster/Warpcast- @saxenasaheb
 
 <!---
 saxenasaheb/saxenasaheb is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
