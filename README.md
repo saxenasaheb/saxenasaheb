@@ -1,9 +1,15 @@
+# Hi, I'm Saxena Saheb
+
 Founder, builder, and community champion.
 Obsessed with new models of global human coordination.
 
-Most active on Farcaster/Warpcast- @saxenasaheb
+## About Me
 
-<!---
-saxenasaheb/saxenasaheb is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-You can click the Preview link to take a look at your changes.
---->
+- Building at the intersection of technology and community
+- Exploring decentralized coordination and governance
+- Passionate about open source and collaborative innovation
+
+## Connect
+
+- **Farcaster/Warpcast:** [@saxenasaheb](https://warpcast.com/saxenasaheb)
+- **GitHub:** [@saxenasaheb](https://github.com/saxenasaheb)
