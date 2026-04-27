@@ -63,35 +63,6 @@
       margin-bottom: 56px;
     }
 
-    .field-wrap {
-      width: 100%;
-      max-width: 420px;
-      margin-bottom: 14px;
-    }
-
-    .field-label {
-      display: block;
-      font-size: 10px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .field-input {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: white;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      color: var(--ink);
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .field-input:focus { border-color: var(--ink); }
-
     .upload-zone {
       width: 100%;
       max-width: 420px;
@@ -495,11 +466,6 @@
   <h1 class="hero-title">Palm<br>Reading</h1>
   <p class="hero-sub">Upload a clear photo of your open palm. Our AI will analyze your lines and reveal what they say about you.</p>
 
-  <div class="field-wrap">
-    <label class="field-label" for="api-key">Anthropic API Key</label>
-    <input type="password" id="api-key" class="field-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
-  </div>
-
   <div class="upload-zone" id="upload-zone">
     <svg class="upload-icon" viewBox="0 0 40 40" fill="none">
       <path d="M20 6v22M11 15l9-9 9 9" stroke="#1c1c1c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -637,7 +603,6 @@ let imgB64 = null, imgMime = null, imgDataUrl = null;
 
 // ── Upload wiring ──
 const zone = document.getElementById('upload-zone');
-const apiInput = document.getElementById('api-key');
 const readBtn = document.getElementById('read-btn');
 const errMsg = document.getElementById('error-msg');
 
@@ -645,27 +610,40 @@ zone.addEventListener('click', () => document.getElementById('file-input').click
 zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--ink)'; });
 zone.addEventListener('dragleave', () => zone.style.borderColor = '');
 zone.addEventListener('drop', e => { e.preventDefault(); zone.style.borderColor = ''; const f = e.dataTransfer.files[0]; if (f) loadFile(f); });
-
 document.getElementById('file-input').addEventListener('change', function() { if (this.files[0]) loadFile(this.files[0]); });
-apiInput.addEventListener('input', syncBtn);
 
 function loadFile(file) {
   if (!file.type.startsWith('image/')) { showErr('Please upload an image file.'); return; }
-  if (file.size > 20 * 1024 * 1024) { showErr('Image too large — please use something under 20 MB.'); return; }
-  imgMime = file.type;
-  const reader = new FileReader();
-  reader.onload = e => {
-    imgDataUrl = e.target.result;
-    imgB64 = imgDataUrl.split(',')[1];
+  if (file.size > 30 * 1024 * 1024) { showErr('Image too large — please use something under 30 MB.'); return; }
+  compressImage(file, 1200, 0.82).then(({ dataUrl, b64, mime }) => {
+    imgDataUrl = dataUrl; imgB64 = b64; imgMime = mime;
     zone.innerHTML = `<img src="${imgDataUrl}" alt="Palm photo">`;
     zone.classList.add('filled');
-    hideErr(); syncBtn();
-  };
-  reader.readAsDataURL(file);
+    hideErr();
+    readBtn.disabled = false;
+  });
 }
 
-function syncBtn() {
-  readBtn.disabled = !(imgB64 && apiInput.value.trim().length > 10);
+// Resize to maxPx on longest side, encode as JPEG at quality q
+function compressImage(file, maxPx, q) {
+  return new Promise(resolve => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width: w, height: h } = img;
+      if (Math.max(w, h) > maxPx) {
+        if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
+        else { w = Math.round(w * maxPx / h); h = maxPx; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', q);
+      resolve({ dataUrl, b64: dataUrl.split(',')[1], mime: 'image/jpeg' });
+    };
+    img.src = url;
+  });
 }
 
 function showErr(m) { errMsg.textContent = m; errMsg.style.display = 'block'; }
@@ -673,75 +651,19 @@ function hideErr() { errMsg.style.display = 'none'; }
 
 // ── Read palm ──
 readBtn.addEventListener('click', async () => {
-  const key = apiInput.value.trim();
-  if (!key || !imgB64) return;
-
+  if (!imgB64) return;
   show('loading');
-
-  const prompt = `You are an expert palmist. Carefully analyze this palm image and produce a detailed, personalized palm reading.
-
-Examine:
-1. Overall hand shape — palm width vs. finger length ratio determines element type: Fire = square palm + short fingers (dynamic, passionate), Earth = square palm + short fingers but more solid (practical, grounded), Air = rectangular palm + long fingers (intellectual, communicative), Water = oval/rectangular palm + long fingers (intuitive, creative). Identify the blend.
-2. Which hand is shown (left or right).
-3. The heart line — the topmost major crease, running horizontally across the upper palm.
-4. The head line — the middle horizontal crease, originating near the life line.
-5. The life line — the prominent curved line arcing around the base of the thumb.
-6. The fate line — the vertical crease rising from the base of the palm toward the middle finger (may be faint or absent; note if so).
-
-Reply ONLY with a raw JSON object — no markdown, no code fences, no extra text. Use this exact shape:
-{
-  "handType": "AIR-EARTH",
-  "dominant": "Left",
-  "element": "Air / Earth",
-  "heartLine": "2-3 sentence reading of the heart line...",
-  "headLine": "2-3 sentence reading of the head line...",
-  "lifeLine": "2-3 sentence reading of the life line...",
-  "fateLine": "2-3 sentence reading of the fate line (or note its absence)...",
-  "handShape": "2 sentence description of overall hand shape and what the combination reveals...",
-  "keyTraits": ["Trait1", "Trait2", "Trait3", "Trait4", "Trait5", "Trait6", "Trait7"],
-  "overallReading": "2-3 sentence holistic synthesis...",
-  "guidance": [
-    "First guidance point...",
-    "Second guidance point...",
-    "Third guidance point...",
-    "Fourth guidance point..."
-  ]
-}`;
-
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/read-palm', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-calls': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1200,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: imgMime, data: imgB64 } },
-            { type: 'text', text: prompt }
-          ]
-        }]
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: imgB64, mimeType: imgMime })
     });
 
-    if (!res.ok) {
-      const e = await res.json().catch(() => ({}));
-      throw new Error(e.error?.message || `API error ${res.status}`);
-    }
-
     const data = await res.json();
-    let raw = data.content[0].text.trim();
-    let reading;
-    try { reading = JSON.parse(raw); }
-    catch { const m = raw.match(/\{[\s\S]*\}/); if (m) reading = JSON.parse(m[0]); else throw new Error('Could not parse response.'); }
+    if (!res.ok) throw new Error(data.error || `Server error ${res.status}`);
 
-    render(reading);
+    render(data.reading);
     show('result');
   } catch (e) {
     show('upload');
@@ -872,7 +794,7 @@ document.getElementById('new-btn').addEventListener('click', () => {
     <p class="upload-text">Tap to upload your palm photo<br><span class="upload-hint">Hold hand flat, palm facing camera</span></p>
     <input type="file" id="file-input" accept="image/*">`;
   document.getElementById('file-input').addEventListener('change', function() { if (this.files[0]) loadFile(this.files[0]); });
-  readBtn.disabled = true;
+  readBtn.disabled = true; // re-disabled until new image chosen
   hideErr();
   show('upload');
 });
