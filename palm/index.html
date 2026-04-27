@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palm Reading — AI Palmistry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #faf9f7;
+      --ink: #1c1c1c;
+      --muted: #7a7570;
+      --border: #e2ddd8;
+      --accent: #b8a89a;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* ── Upload Screen ── */
+    #upload-screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px 60px;
+    }
+
+    .wordmark {
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 64px;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garant', serif;
+      font-size: clamp(56px, 10vw, 108px);
+      font-weight: 300;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .hero-sub {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--muted);
+      text-align: center;
+      max-width: 340px;
+      line-height: 1.75;
+      margin-bottom: 56px;
+    }
+
+    .field-wrap {
+      width: 100%;
+      max-width: 420px;
+      margin-bottom: 14px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .field-input:focus { border-color: var(--ink); }
+
+    .upload-zone {
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 4/3;
+      border: 1px dashed var(--border);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+      overflow: hidden;
+      background: white;
+    }
+    .upload-zone:hover { border-color: var(--ink); }
+    .upload-zone.filled { border-style: solid; }
+    .upload-zone.filled img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 19px;
+    }
+    #file-input { display: none; }
+
+    .upload-icon { width: 36px; height: 36px; margin-bottom: 14px; opacity: 0.25; }
+    .upload-text { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.65; }
+    .upload-hint { font-size: 11px; color: #ccc; }
+
+    .error-msg {
+      max-width: 420px;
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px 18px;
+      background: #fff5f5;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      font-size: 12px;
+      color: #dc2626;
+      text-align: center;
+      display: none;
+    }
+
+    .read-btn {
+      margin-top: 24px;
+      padding: 16px 52px;
+      background: var(--ink);
+      color: white;
+      border: none;
+      border-radius: 100px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .read-btn:hover:not(:disabled) { opacity: 0.82; transform: translateY(-1px); }
+    .read-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .legal {
+      margin-top: 28px;
+      font-size: 11px;
+      color: #ccc;
+      text-align: center;
+      max-width: 320px;
+      line-height: 1.65;
+    }
+
+    /* ── Loading Screen ── */
+    #loading-screen {
+      display: none;
+      min-height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    .loading-title {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 36px;
+      font-weight: 300;
+    }
+    .loading-sub { font-size: 13px; color: var(--muted); }
+    .dots { display: flex; gap: 7px; margin-top: 4px; }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      animation: blink 1.4s ease-in-out infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.18s; }
+    .dot:nth-child(3) { animation-delay: 0.36s; }
+    @keyframes blink {
+      0%, 80%, 100% { transform: scale(0.55); opacity: 0.35; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* ── Result Screen ── */
+    #result-screen {
+      display: none;
+      padding: 48px 20px 96px;
+    }
+
+    #reading-card {
+      max-width: 880px;
+      margin: 0 auto;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 52px 48px;
+    }
+
+    /* Header */
+    .rcard-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 36px;
+      align-items: start;
+      padding-bottom: 44px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 40px;
+    }
+
+    .rcard-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .rcard-title {
+      font-family: 'Cormorant Garant', serif;
+      font-size: clamp(52px, 8vw, 80px);
+      font-weight: 300;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      margin-bottom: 18px;
+    }
+
+    .rcard-blurb {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 360px;
+    }
+
+    .photo-col { width: 190px; flex-shrink: 0; }
+
+    .result-photo {
+      width: 190px;
+      height: 190px;
+      object-fit: cover;
+      border-radius: 16px;
+      display: block;
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 20px;
+      margin-top: 14px;
+    }
+    .meta-item {}
+    .meta-lbl {
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .meta-val {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 17px;
+      font-weight: 400;
+    }
+
+    /* Mid grid */
+    .mid-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 24px;
+    }
+
+    .panel-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 22px;
+      text-align: center;
+    }
+
+    /* SVG hand diagram */
+    .svg-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .svg-caption {
+      font-size: 10px;
+      color: #ccc;
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* Traits panel */
+    .traits-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .sub-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .sub-icon {
+      width: 26px;
+      height: 26px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .sub-body {
+      font-size: 13px;
+      line-height: 1.72;
+      color: var(--ink);
+    }
+
+    .tag-wrap { display: flex; flex-wrap: wrap; gap: 7px; }
+    .tag {
+      font-size: 11px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 4px 13px;
+    }
+
+    /* Lines grid */
+    .lines-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .line-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 20px;
+    }
+
+    .line-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 11px;
+    }
+
+    .line-icon {
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .line-name {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .line-sub {
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .line-body {
+      font-size: 13px;
+      line-height: 1.72;
+      color: var(--ink);
+    }
+
+    /* Bottom grid */
+    .btm-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    .btm-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 26px 22px;
+    }
+
+    .btm-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    .overall-body {
+      font-size: 13px;
+      line-height: 1.78;
+      color: var(--ink);
+    }
+
+    .guidance-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+    .guidance-list li {
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.65;
+      padding-left: 15px;
+      position: relative;
+    }
+    .guidance-list li::before { content: '·'; position: absolute; left: 0; color: var(--accent); font-size: 18px; line-height: 1; top: 1px; }
+
+    /* Card footer */
+    .rcard-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .footer-gem { color: var(--accent); font-size: 9px; }
+    .footer-txt { font-size: 11px; color: var(--muted); font-style: italic; }
+
+    /* Action bar */
+    .action-bar {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      padding: 14px 34px;
+      border-radius: 100px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      border: none;
+    }
+    .btn:hover { opacity: 0.8; }
+    .btn-primary { background: var(--ink); color: white; }
+    .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--border); }
+
+    /* Responsive */
+    @media (max-width: 660px) {
+      #reading-card { padding: 30px 20px; }
+      .rcard-header { grid-template-columns: 1fr; }
+      .photo-col { width: 100%; }
+      .result-photo { width: 100%; height: 220px; }
+      .mid-grid, .lines-grid, .btm-grid { grid-template-columns: 1fr; }
+      .rcard-title { font-size: 52px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Upload ── -->
+<div id="upload-screen">
+  <p class="wordmark">✦ &nbsp; Palmistry AI</p>
+
+  <h1 class="hero-title">Palm<br>Reading</h1>
+  <p class="hero-sub">Upload a clear photo of your open palm. Our AI will analyze your lines and reveal what they say about you.</p>
+
+  <div class="field-wrap">
+    <label class="field-label" for="api-key">Anthropic API Key</label>
+    <input type="password" id="api-key" class="field-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+  </div>
+
+  <div class="upload-zone" id="upload-zone">
+    <svg class="upload-icon" viewBox="0 0 40 40" fill="none">
+      <path d="M20 6v22M11 15l9-9 9 9" stroke="#1c1c1c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 30v4h28v-4" stroke="#1c1c1c" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <p class="upload-text">Tap to upload your palm photo<br><span class="upload-hint">Hold hand flat, palm facing camera</span></p>
+    <input type="file" id="file-input" accept="image/*">
+  </div>
+
+  <div class="error-msg" id="error-msg"></div>
+
+  <button class="read-btn" id="read-btn" disabled>Read My Palm</button>
+
+  <p class="legal">Your key is never stored. Calls go directly from your browser to Anthropic.</p>
+</div>
+
+<!-- ── Loading ── -->
+<div id="loading-screen">
+  <p class="loading-title">Reading your palm…</p>
+  <p class="loading-sub">Analyzing lines, shape &amp; character</p>
+  <div class="dots">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+</div>
+
+<!-- ── Result ── -->
+<div id="result-screen">
+  <div id="reading-card">
+
+    <div class="rcard-header">
+      <div>
+        <p class="rcard-eyebrow">Your Personal</p>
+        <h2 class="rcard-title">Palm<br>Reading</h2>
+        <p class="rcard-blurb">Palmistry is an ancient art that interprets the lines and shapes of your hand to reveal insights about your personality, strengths, and life path.</p>
+      </div>
+      <div class="photo-col">
+        <img id="result-photo" class="result-photo" src="" alt="Your palm">
+        <div class="card-meta">
+          <div class="meta-item">
+            <div class="meta-lbl">Hand Type</div>
+            <div class="meta-val" id="m-type">—</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-lbl">Dominant</div>
+            <div class="meta-val" id="m-dom">—</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-lbl">Element</div>
+            <div class="meta-val" id="m-elem">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mid-grid">
+      <div class="panel">
+        <p class="panel-label">Your Main Lines</p>
+        <div class="svg-wrap" id="svg-wrap"></div>
+        <p class="svg-caption">*Illustration of your palm's main lines.</p>
+      </div>
+
+      <div class="panel">
+        <div class="traits-panel">
+          <div>
+            <div class="sub-label"><div class="sub-icon">✋</div>Hand Shape</div>
+            <p class="sub-body" id="hand-shape">—</p>
+          </div>
+          <div>
+            <div class="sub-label"><div class="sub-icon">✦</div>Key Traits</div>
+            <div class="tag-wrap" id="tag-wrap"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lines-grid">
+      <div class="line-card">
+        <div class="line-head">
+          <div class="line-icon">♡</div>
+          <div><div class="line-name">Heart Line</div><div class="line-sub">Emotions · Love · Relationships</div></div>
+        </div>
+        <p class="line-body" id="heart-line">—</p>
+      </div>
+      <div class="line-card">
+        <div class="line-head">
+          <div class="line-icon">◎</div>
+          <div><div class="line-name">Head Line</div><div class="line-sub">Mind · Thinking · Communication</div></div>
+        </div>
+        <p class="line-body" id="head-line">—</p>
+      </div>
+      <div class="line-card">
+        <div class="line-head">
+          <div class="line-icon">◇</div>
+          <div><div class="line-name">Life Line</div><div class="line-sub">Energy · Vitality · Life Path</div></div>
+        </div>
+        <p class="line-body" id="life-line">—</p>
+      </div>
+      <div class="line-card">
+        <div class="line-head">
+          <div class="line-icon">✦</div>
+          <div><div class="line-name">Fate Line</div><div class="line-sub">Purpose · Career · Direction</div></div>
+        </div>
+        <p class="line-body" id="fate-line">—</p>
+      </div>
+    </div>
+
+    <div class="btm-grid">
+      <div class="btm-card">
+        <p class="btm-label">Overall Reading</p>
+        <p class="overall-body" id="overall">—</p>
+      </div>
+      <div class="btm-card">
+        <p class="btm-label">Guidance</p>
+        <ul class="guidance-list" id="guidance"></ul>
+      </div>
+    </div>
+
+    <div class="rcard-footer">
+      <span class="footer-gem">✦</span>
+      <span class="footer-txt">Palmistry offers guidance, not absolute answers. You hold the power to shape your future.</span>
+      <span class="footer-gem">✦</span>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn btn-ghost" id="new-btn">New Reading</button>
+  </div>
+</div>
+
+<script>
+// ── State ──
+let imgB64 = null, imgMime = null, imgDataUrl = null;
+
+// ── Upload wiring ──
+const zone = document.getElementById('upload-zone');
+const apiInput = document.getElementById('api-key');
+const readBtn = document.getElementById('read-btn');
+const errMsg = document.getElementById('error-msg');
+
+zone.addEventListener('click', () => document.getElementById('file-input').click());
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--ink)'; });
+zone.addEventListener('dragleave', () => zone.style.borderColor = '');
+zone.addEventListener('drop', e => { e.preventDefault(); zone.style.borderColor = ''; const f = e.dataTransfer.files[0]; if (f) loadFile(f); });
+
+document.getElementById('file-input').addEventListener('change', function() { if (this.files[0]) loadFile(this.files[0]); });
+apiInput.addEventListener('input', syncBtn);
+
+function loadFile(file) {
+  if (!file.type.startsWith('image/')) { showErr('Please upload an image file.'); return; }
+  if (file.size > 20 * 1024 * 1024) { showErr('Image too large — please use something under 20 MB.'); return; }
+  imgMime = file.type;
+  const reader = new FileReader();
+  reader.onload = e => {
+    imgDataUrl = e.target.result;
+    imgB64 = imgDataUrl.split(',')[1];
+    zone.innerHTML = `<img src="${imgDataUrl}" alt="Palm photo">`;
+    zone.classList.add('filled');
+    hideErr(); syncBtn();
+  };
+  reader.readAsDataURL(file);
+}
+
+function syncBtn() {
+  readBtn.disabled = !(imgB64 && apiInput.value.trim().length > 10);
+}
+
+function showErr(m) { errMsg.textContent = m; errMsg.style.display = 'block'; }
+function hideErr() { errMsg.style.display = 'none'; }
+
+// ── Read palm ──
+readBtn.addEventListener('click', async () => {
+  const key = apiInput.value.trim();
+  if (!key || !imgB64) return;
+
+  show('loading');
+
+  const prompt = `You are an expert palmist. Carefully analyze this palm image and produce a detailed, personalized palm reading.
+
+Examine:
+1. Overall hand shape — palm width vs. finger length ratio determines element type: Fire = square palm + short fingers (dynamic, passionate), Earth = square palm + short fingers but more solid (practical, grounded), Air = rectangular palm + long fingers (intellectual, communicative), Water = oval/rectangular palm + long fingers (intuitive, creative). Identify the blend.
+2. Which hand is shown (left or right).
+3. The heart line — the topmost major crease, running horizontally across the upper palm.
+4. The head line — the middle horizontal crease, originating near the life line.
+5. The life line — the prominent curved line arcing around the base of the thumb.
+6. The fate line — the vertical crease rising from the base of the palm toward the middle finger (may be faint or absent; note if so).
+
+Reply ONLY with a raw JSON object — no markdown, no code fences, no extra text. Use this exact shape:
+{
+  "handType": "AIR-EARTH",
+  "dominant": "Left",
+  "element": "Air / Earth",
+  "heartLine": "2-3 sentence reading of the heart line...",
+  "headLine": "2-3 sentence reading of the head line...",
+  "lifeLine": "2-3 sentence reading of the life line...",
+  "fateLine": "2-3 sentence reading of the fate line (or note its absence)...",
+  "handShape": "2 sentence description of overall hand shape and what the combination reveals...",
+  "keyTraits": ["Trait1", "Trait2", "Trait3", "Trait4", "Trait5", "Trait6", "Trait7"],
+  "overallReading": "2-3 sentence holistic synthesis...",
+  "guidance": [
+    "First guidance point...",
+    "Second guidance point...",
+    "Third guidance point...",
+    "Fourth guidance point..."
+  ]
+}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-calls': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1200,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: imgMime, data: imgB64 } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e.error?.message || `API error ${res.status}`);
+    }
+
+    const data = await res.json();
+    let raw = data.content[0].text.trim();
+    let reading;
+    try { reading = JSON.parse(raw); }
+    catch { const m = raw.match(/\{[\s\S]*\}/); if (m) reading = JSON.parse(m[0]); else throw new Error('Could not parse response.'); }
+
+    render(reading);
+    show('result');
+  } catch (e) {
+    show('upload');
+    showErr(e.message || 'Something went wrong — please try again.');
+  }
+});
+
+// ── Render result ──
+function render(r) {
+  document.getElementById('result-photo').src = imgDataUrl;
+  document.getElementById('m-type').textContent = r.handType || '—';
+  document.getElementById('m-dom').textContent = r.dominant || '—';
+  document.getElementById('m-elem').textContent = r.element || '—';
+  document.getElementById('hand-shape').textContent = r.handShape || '—';
+  document.getElementById('heart-line').textContent = r.heartLine || '—';
+  document.getElementById('head-line').textContent = r.headLine || '—';
+  document.getElementById('life-line').textContent = r.lifeLine || '—';
+  document.getElementById('fate-line').textContent = r.fateLine || '—';
+  document.getElementById('overall').textContent = r.overallReading || '—';
+
+  const tw = document.getElementById('tag-wrap');
+  tw.innerHTML = '';
+  (r.keyTraits || []).forEach(t => {
+    const s = document.createElement('span');
+    s.className = 'tag';
+    s.textContent = t;
+    tw.appendChild(s);
+  });
+
+  const gl = document.getElementById('guidance');
+  gl.innerHTML = '';
+  (r.guidance || []).forEach(g => {
+    const li = document.createElement('li');
+    li.textContent = g;
+    gl.appendChild(li);
+  });
+
+  document.getElementById('svg-wrap').innerHTML = handSVG();
+}
+
+// ── SVG palm illustration ──
+function handSVG() {
+  return `<svg width="260" height="320" viewBox="0 0 260 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Palm body -->
+  <path d="M86,215
+    C68,215 52,205 46,188
+    C40,170 42,150 46,132
+    C50,112 54,92 58,74
+    C62,56 66,42 74,34
+    C80,28 88,30 92,40
+    C96,52 96,68 96,84
+    L96,60
+    C96,46 100,36 110,34
+    C118,32 124,38 126,50
+    C128,62 128,76 128,90
+    L128,66
+    C128,52 132,40 142,38
+    C150,36 156,42 158,54
+    C160,66 160,80 160,94
+    L160,74
+    C160,60 164,50 174,48
+    C182,46 188,54 190,66
+    C192,80 190,96 188,112
+    C186,128 182,144 180,160
+    C178,176 178,190 174,204
+    C170,218 158,224 142,226
+    C126,228 108,228 86,215 Z"
+    stroke="#1c1c1c" stroke-width="1.2" fill="white"/>
+
+  <!-- Thumb -->
+  <path d="M86,215
+    C74,208 60,198 54,182
+    C48,164 50,144 54,126
+    C58,108 62,88 64,70
+    C66,54 70,40 78,34
+    C84,28 92,32 94,42
+    C98,56 96,74 96,84"
+    stroke="#1c1c1c" stroke-width="1.2" fill="none"/>
+
+  <!-- Heart line -->
+  <path d="M76,148 C96,142 116,140 138,142 C154,144 168,150 178,158"
+    stroke="#1c1c1c" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Head line -->
+  <path d="M78,170 C100,167 122,167 144,170 C160,173 172,178 180,184"
+    stroke="#1c1c1c" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Life line -->
+  <path d="M102,120 C96,142 92,166 90,186 C88,200 88,210 90,216"
+    stroke="#1c1c1c" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Fate line -->
+  <path d="M134,212 C134,196 136,178 138,162 C140,146 142,130 144,116"
+    stroke="#1c1c1c" stroke-width="1" stroke-linecap="round" opacity="0.55"/>
+
+  <!-- Labels -->
+  <line x1="178" y1="156" x2="198" y2="148" stroke="#ccc" stroke-width="0.7"/>
+  <text x="200" y="151" font-family="Inter,sans-serif" font-size="8" fill="#aaa" letter-spacing="0.8">HEART LINE</text>
+
+  <line x1="182" y1="183" x2="198" y2="178" stroke="#ccc" stroke-width="0.7"/>
+  <text x="200" y="181" font-family="Inter,sans-serif" font-size="8" fill="#aaa" letter-spacing="0.8">HEAD LINE</text>
+
+  <line x1="89" y1="186" x2="44" y2="182" stroke="#ccc" stroke-width="0.7"/>
+  <text x="2" y="185" font-family="Inter,sans-serif" font-size="8" fill="#aaa" letter-spacing="0.8">LIFE LINE</text>
+
+  <line x1="136" y1="212" x2="136" y2="234" stroke="#ccc" stroke-width="0.7"/>
+  <text x="105" y="244" font-family="Inter,sans-serif" font-size="8" fill="#aaa" letter-spacing="0.8">FATE LINE</text>
+</svg>`;
+}
+
+// ── Screen switching ──
+function show(s) {
+  document.getElementById('upload-screen').style.display = s === 'upload' ? 'flex' : 'none';
+  document.getElementById('loading-screen').style.display = s === 'loading' ? 'flex' : 'none';
+  document.getElementById('result-screen').style.display = s === 'result' ? 'block' : 'none';
+}
+
+// ── New reading ──
+document.getElementById('new-btn').addEventListener('click', () => {
+  imgB64 = imgMime = imgDataUrl = null;
+  const z = document.getElementById('upload-zone');
+  z.classList.remove('filled');
+  z.innerHTML = `
+    <svg class="upload-icon" viewBox="0 0 40 40" fill="none">
+      <path d="M20 6v22M11 15l9-9 9 9" stroke="#1c1c1c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 30v4h28v-4" stroke="#1c1c1c" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <p class="upload-text">Tap to upload your palm photo<br><span class="upload-hint">Hold hand flat, palm facing camera</span></p>
+    <input type="file" id="file-input" accept="image/*">`;
+  document.getElementById('file-input').addEventListener('change', function() { if (this.files[0]) loadFile(this.files[0]); });
+  readBtn.disabled = true;
+  hideErr();
+  show('upload');
+});
+</script>
+</body>
+</html>
