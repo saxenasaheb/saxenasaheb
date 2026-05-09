@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+/*
+  Google Fonts are loaded via <link> in layout.tsx <head>.
+  CSS variables below reference these family names directly.
+  In production (Vercel), next/font/google can be swapped in for
+  additional optimisation — fonts load correctly either way.
+*/
+
+@theme {
+  /* Palette */
+  --color-cream: #F5F0E8;
+  --color-taupe: #E8DFD3;
+  --color-clay: #D4C4B0;
+  --color-charcoal: #2A2826;
+  --color-warm-grey: #6B6560;
+  --color-terracotta: #A8654A;
+  --color-border: #E0D6C7;
+
+  /* Font families */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-script: 'Caveat', cursive;
+
+  /* Fluid type */
+  --text-hero: clamp(3rem, 6vw + 1rem, 6rem);
+  --text-section: clamp(2rem, 3vw + 1rem, 3.5rem);
+  --text-eyebrow: 0.6875rem;
+
+  /* Section spacing */
+  --spacing-section: clamp(4rem, 8vw, 8rem);
+}
+
+/* Reset dark mode — this site is light-only */
+:root {
+  color-scheme: light;
+}
+
+body {
+  background-color: #F5F0E8;
+  color: #2A2826;
+  font-family: var(--font-body);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Base prose constraint */
+.prose-constraint {
+  max-width: 65ch;
+}
+
+/* Arch frame shape */
+.arch-frame {
+  border-radius: 50% 50% 12px 12px / 60% 60% 12px 12px;
+  overflow: hidden;
+}
+
+/* Eyebrow text style */
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #6B6560;
+}
+
+/* Display headings */
+.heading-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.1;
+  color: #2A2826;
+}
+
+/* Script accent */
+.script-accent {
+  font-family: var(--font-script);
+  font-weight: 400;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus visible */
+:focus-visible {
+  outline: 2px solid #A8654A;
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
