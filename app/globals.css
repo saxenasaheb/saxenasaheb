@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,700;1,9..144,300;1,9..144,400;1,9..144,700&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cream: #f5efe6;
+  --ink: #1a1612;
+  --saffron: #e8722c;
+  --marigold: #f4a23b;
+}
+
+::selection {
+  background-color: #e8722c;
+  color: #f5efe6;
+}
+
+body {
+  background-color: #f5efe6;
+  background-image:
+    radial-gradient(ellipse at 12% 18%, rgba(232, 114, 44, 0.09) 0%, transparent 52%),
+    radial-gradient(ellipse at 88% 82%, rgba(244, 162, 59, 0.07) 0%, transparent 52%),
+    radial-gradient(ellipse at 50% 50%, rgba(232, 114, 44, 0.03) 0%, transparent 70%);
+  color: #1a1612;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+
+.wavy {
+  text-decoration: underline wavy #e8722c;
+  text-underline-offset: 5px;
+}
+
+.tape {
+  position: relative;
+}
+
+.tape::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 18%;
+  right: 18%;
+  height: 9px;
+  background: rgba(232, 114, 44, 0.22);
+  transform: rotate(-0.8deg);
+  z-index: -1;
+}
+
+.scribble-border {
+  border: 2px solid currentColor;
+  box-shadow: 3px 3px 0 currentColor;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+}
