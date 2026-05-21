@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { submitContactForm } from "@/app/actions/contact";
+import { practitioner } from "@/lib/site-config";
 import { CheckCircle, AlertCircle, Send } from "lucide-react";
 
 const SUBJECTS = [
@@ -24,31 +24,50 @@ export function ContactForm() {
   const [errorMsg, setErrorMsg] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus("loading");
-    setErrorMsg("");
 
     const form = e.currentTarget;
     const fd = new FormData(form);
 
-    const result = await submitContactForm({
-      name: fd.get("name") as string,
-      email: fd.get("email") as string,
-      phone: fd.get("phone") as string,
-      subject: fd.get("subject") as string,
-      message: fd.get("message") as string,
-      gdprConsent: fd.get("gdprConsent") === "on",
-      honeypot: fd.get("_hp") as string,
-    });
+    // Honeypot check
+    if ((fd.get("_hp") as string)?.trim()) return;
 
-    if (result.success) {
-      setStatus("success");
-      formRef.current?.reset();
-    } else {
+    if (!(fd.get("gdprConsent") === "on")) {
       setStatus("error");
-      setErrorMsg(result.error ?? "Something went wrong. Please try again.");
+      setErrorMsg("GDPR consent is required.");
+      return;
     }
+
+    const name = (fd.get("name") as string).trim();
+    const email = (fd.get("email") as string).trim();
+    const phone = (fd.get("phone") as string).trim();
+    const subject = (fd.get("subject") as string) || "General enquiry";
+    const message = (fd.get("message") as string).trim();
+
+    if (!name || !email || !message) {
+      setStatus("error");
+      setErrorMsg("Please complete all required fields.");
+      return;
+    }
+
+    const body = [
+      `Name: ${name}`,
+      `Email: ${email}`,
+      phone ? `Phone: ${phone}` : null,
+      `Subject: ${subject}`,
+      "",
+      message,
+    ]
+      .filter((l) => l !== null)
+      .join("\n");
+
+    window.location.href = `mailto:${practitioner.email}?subject=${encodeURIComponent(
+      `[Website Enquiry] ${subject} — ${name}`
+    )}&body=${encodeURIComponent(body)}`;
+
+    setStatus("success");
+    formRef.current?.reset();
   }
 
   if (status === "success") {
