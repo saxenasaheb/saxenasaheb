@@ -1,0 +1,30 @@
+# Foreign-incorporated companies with real Bangalore offices that MCA Karnataka
+# won't surface (Delaware C-corps, Singapore holdcos, etc.), plus any other
+# edge cases that need a hand-curated row. These are upserted in stage A8 and
+# take precedence over scraped/matched data on conflicting fields.
+#
+# Each entry only needs the fields you can fill confidently; the pipeline keeps
+# the rest blank for later enrichment. Geocoding (A6) still runs on
+# office_address_raw, so a good street address is the most valuable field here.
+#
+# OPEN PRODUCT QUESTION (brief #3): this list is the agreed home for foreign-
+# incorporated cos like Atlan, Postman, etc. Target ~30 entries.
+
+companies:
+  # - company_name: Postman
+  #   website: https://www.postman.com
+  #   sector: SaaS
+  #   stage: Unicorn
+  #   office_address_raw: "Postman, 7th Floor, Tower B, Diamond District, HAL Old Airport Rd, Bangalore 560008"
+  #   office_locality: Domlur
+  #   address_source: manual
+  #   address_confidence: high
+  #   notes: "San Francisco HQ, large Bangalore engineering office."
+  #
+  # - company_name: Atlan
+  #   website: https://atlan.com
+  #   sector: SaaS
+  #   stage: Series B+
+  #   office_address_raw: ""
+  #   address_source: manual
+  #   notes: "Delaware C-corp; India ops in Bangalore."
