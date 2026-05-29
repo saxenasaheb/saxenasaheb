@@ -7,31 +7,33 @@ import { POET } from '../lib/poems';
     <h1 lang="hi">परिचय</h1>
 
     <div class="reading">
-      {/*
-        {{ PORTRAIT }} — replace the placeholder with a real photo:
-        drop the image in /public/ (e.g. about-portrait.jpg) and use:
-        <img class="about-portrait" src="/about-portrait.jpg" alt="डॉ. प्रणव गौतम" />
-      */}
-      <div class="about-portrait about-portrait--placeholder" aria-hidden="true">
-        फ़ोटो यहाँ<br />{'{{ PORTRAIT }}'}
-      </div>
+      <img
+        class="about-portrait"
+        src="/portrait.jpg"
+        width="200"
+        height="240"
+        alt="डॉ. प्रणव गौतम"
+      />
 
       <div class="about-body" lang="hi">
-        {/* {{ BIO }} — replace the placeholder paragraphs below with
-            Dr. Gautam's real background and the story behind his writing. */}
         <p>
-          डॉ. प्रणव गौतम राजकीय आयुर्वेदिक महाविद्यालय एवं चिकित्सालय, बरेली में
-          चिकित्सक हैं। दिन में रोगियों की सेवा और शेष समय में शब्दों की साधना —
-          यही उनकी दिनचर्या है।
+          डॉ. प्रणव गौतम पिछले दो दशकों से अधिक समय से चिकित्सा के क्षेत्र में हैं।
+          बरेली में जन्मे और पले-बढ़े, यही शहर आज भी उनकी बहुत-सी रचनाओं में बसा
+          हुआ है।
         </p>
         <p>
-          उनकी रचनाओं में कहीं प्रेम की कोमलता है, कहीं समय से संवाद, और कहीं उस
-          मौन पर प्रश्न जो हमारे आसपास पसरा रहता है। ग़ज़ल हो या गीत — वे सहज,
-          ईमानदार और अपनी ज़मीन से जुड़े हुए हैं।
+          उनके लिए चिकित्सा और कविता कभी एक-दूसरे से दूर नहीं रहीं — दोनों ही इंसान
+          को, उसके मन को, और जीवन के छोटे-छोटे एहसासों को ध्यान से देखने का तरीक़ा
+          हैं। उनकी कविताएँ और ग़ज़लें प्रेम, सौंदर्य और भारत के इर्द-गिर्द घूमती
+          हैं — वे विषय जिनकी ओर वे बार-बार लौटते हैं।
+        </p>
+        <p>
+          वे बरेली में अपनी पत्नी, जो अंग्रेज़ी की प्राध्यापिका हैं, और अपने दो
+          बच्चों — एक बेटे और एक बेटी — के साथ रहते हैं।
         </p>
         <p class="about-affil">
-          {/* This is placeholder text — replace with the real परिचय. */}
-          राजकीय आयुर्वेदिक महाविद्यालय एवं चिकित्सालय, बरेली
+          यहाँ संकलित ये रचनाएँ उनके वर्षों के अनुभव, प्रेम और जीवन के प्रति उनकी
+          दृष्टि का प्रतिबिंब हैं।
         </p>
       </div>
     </div>

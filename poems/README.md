@@ -52,12 +52,12 @@ and gets its own page.
 
 A small player appears under the title.
 
-## Real content still to add
+## Updating the photo or bio
 
-Search the source for these placeholders and replace them:
-- **`{{ PORTRAIT }}`** — the poet's photo, in `src/pages/index.astro` and
-  `src/pages/about.astro` (drop the image in `public/`).
-- **`{{ BIO }}`** — the real परिचय text in `src/pages/about.astro`.
+- **Photo:** replace `public/portrait.jpg` (used on the home page and परिचय).
+  If the face sits differently in a new photo, tweak `object-position` on
+  `.home-portrait` / `.about-portrait` in `src/styles/global.css`.
+- **Bio:** edit the परिचय text in `src/pages/about.astro`.
 
 ## Project layout
 

@@ -8,12 +8,13 @@ const couplet = featured ? opening(featured.body ?? '', 2) : [];
 ---
 <BaseLayout title={`${POET.name} — कविताएँ एवं ग़ज़लें`}>
   <section class="home wrap">
-    {/*
-      {{ PORTRAIT }} — replace the placeholder below with a real photo:
-      drop the image in /public/ (e.g. portrait.jpg) and use:
-      <img class="home-portrait" src="/portrait.jpg" alt="डॉ. प्रणव गौतम" />
-    */}
-    <div class="home-portrait home-portrait--placeholder" aria-hidden="true" lang="hi">प्र</div>
+    <img
+      class="home-portrait"
+      src="/portrait.jpg"
+      width="160"
+      height="160"
+      alt="डॉ. प्रणव गौतम"
+    />
 
     <h1 class="home-name" lang="hi">डॉ. प्रणव गौतम</h1>
     <p class="home-tagline" lang="hi">
