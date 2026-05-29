@@ -140,14 +140,30 @@ body {
 }
 
 .poem-note {
+  font-family: var(--font-ui);
+  font-style: italic;
+  font-size: 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 32px;
+}
+
+/* A longer prose preface — the occasion a poem was written for. */
+.poem-context {
   font-family: var(--font-poem);
   font-style: italic;
   font-size: 17px;
-  color: var(--accent);
-  margin-bottom: 36px;
+  line-height: 1.8;
+  color: var(--ink-soft);
+  max-width: 540px;
+  margin: 0 auto 40px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--rule);
 }
 
-.poem-title + .poem-body { margin-top: 36px; }
+.poem-title + .poem-body,
+.poem-note + .poem-body { margin-top: 36px; }
 
 /* The poem text. Left-aligned within a centered block so each
    line's true length and indentation are honest, while the block
@@ -172,8 +188,15 @@ body {
   text-indent: -1.4em;
 }
 
+.poem-signature {
+  font-family: var(--font-poem);
+  font-size: 18px;
+  color: var(--ink-soft);
+  margin-top: 44px;
+}
+
 .poem-date {
-  margin-top: 48px;
+  margin-top: 12px;
   font-size: 13px;
   letter-spacing: 2px;
   text-transform: uppercase;

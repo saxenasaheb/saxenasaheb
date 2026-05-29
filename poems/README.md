@@ -1,7 +1,7 @@
-# कविताएँ — Hindi Poetry Site
+# कविताएँ — डॉ. प्रणव गौतम
 
-A simple, elegant site for showcasing Hindi poems. Each poem gets its own
-page; the home page lists them all.
+A simple, elegant site for showcasing the Hindi poems and ghazals of
+**डॉ. प्रणव गौतम**. Each poem gets its own page; the home page lists them all.
 
 ## Viewing it
 
@@ -21,7 +21,8 @@ Copy an existing block and paste it at the **top** of the list:
   id: "ek-pehchaan",        // short unique name for the link (lowercase, dashes)
   title: "एक पहचान",         // the poem's title
   date: "2024",             // optional — leave "" to hide
-  note: "किसी के नाम",        // optional dedication/context — leave "" to hide
+  note: "ग़ज़ल",              // optional short label/dedication — "" to hide
+  context: "",              // optional longer preface (the occasion) — "" to hide
   body: `पहली पंक्ति यहाँ,
 दूसरी पंक्ति यहाँ।
 

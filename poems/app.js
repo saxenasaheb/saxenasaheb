@@ -130,7 +130,22 @@
       article.appendChild(note);
     }
 
+    if (poem.context) {
+      const context = document.createElement("p");
+      context.className = "poem-context";
+      context.textContent = poem.context;
+      article.appendChild(context);
+    }
+
     article.appendChild(renderBody(poem.body));
+
+    // The poet's signature, shown on every poem.
+    if (typeof POET !== "undefined" && POET.name) {
+      const sig = document.createElement("p");
+      sig.className = "poem-signature";
+      sig.textContent = "— " + POET.name;
+      article.appendChild(sig);
+    }
 
     if (poem.date) {
       const date = document.createElement("p");
