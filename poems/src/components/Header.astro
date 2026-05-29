@@ -1,0 +1,16 @@
+---
+// Active-link highlighting based on the current path.
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+---
+<header class="site-header">
+  <div class="wrap">
+    <a class="site-name" href="/" lang="hi">डॉ. प्रणव गौतम</a>
+    <nav class="site-nav" aria-label="मुख्य">
+      <a href="/kavitayein" aria-current={isActive('/kavitayein') ? 'page' : undefined} lang="hi">कविताएँ</a>
+      <a href="/ghazalein" aria-current={isActive('/ghazalein') ? 'page' : undefined} lang="hi">ग़ज़लें</a>
+      <a href="/about" aria-current={isActive('/about') ? 'page' : undefined} lang="hi">परिचय</a>
+    </nav>
+  </div>
+</header>

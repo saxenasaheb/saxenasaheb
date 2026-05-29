@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PoemBody from '../../components/PoemBody.astro';
+import AudioPlayer from '../../components/AudioPlayer.astro';
+import PrevNext from '../../components/PrevNext.astro';
+import { getSortedPoems, opening, POET, type Poem } from '../../lib/poems';
+
+export async function getStaticPaths() {
+  const poems = await getSortedPoems();
+  // Prev/next walk within the same category so readers stay in one form.
+  const byCat: Record<string, Poem[]> = {};
+  for (const p of poems) (byCat[p.data.category] ??= []).push(p);
+
+  return poems.map((poem) => {
+    const siblings = byCat[poem.data.category];
+    const i = siblings.findIndex((p) => p.id === poem.id);
+    const prev = i > 0 ? siblings[i - 1] : undefined;
+    const next = i < siblings.length - 1 ? siblings[i + 1] : undefined;
+    return {
+      params: { slug: poem.id },
+      props: {
+        poem,
+        prev: prev && { slug: prev.id, title: prev.data.title },
+        next: next && { slug: next.id, title: next.data.title },
+      },
+    };
+  });
+}
+
+const { poem, prev, next } = Astro.props;
+const { title, category, audio, context } = poem.data;
+const body = poem.body ?? '';
+
+const kicker = category === 'ghazal' ? 'ग़ज़ल' : 'कविता';
+// A couplet of the poem makes a lovely WhatsApp/social preview.
+const desc = opening(body, 2).join(' · ') || `${POET.name} की रचना`;
+---
+<BaseLayout title={`${title} — ${POET.name}`} description={desc} ogType="article">
+  <article class="poem wrap">
+    <p class="poem-kicker" lang="hi">{kicker}</p>
+    <h1 class="poem-title" lang="hi">{title}</h1>
+
+    {context && <p class="poem-context" lang="hi">{context}</p>}
+
+    <PoemBody body={body} />
+
+    <AudioPlayer src={audio} />
+
+    <p class="poem-sign" lang="hi">— {POET.name}</p>
+  </article>
+
+  <PrevNext prev={prev} next={next} />
+</BaseLayout>

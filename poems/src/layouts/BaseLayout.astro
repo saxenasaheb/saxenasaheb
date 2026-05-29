@@ -1,0 +1,55 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Optional OG type, e.g. "article" for a poem. */
+  ogType?: string;
+}
+
+const {
+  title,
+  description = 'डॉ. प्रणव गौतम की कविताएँ एवं ग़ज़लें — Hindi poems and ghazals by Dr. Pranav Gautam.',
+  ogType = 'website',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph (for WhatsApp / social link previews) -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="hi_IN" />
+    <meta name="twitter:card" content="summary" />
+
+    <!-- Fonts: Tiro Devanagari Hindi (verse) + Mukta (UI). swap = never invisible. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:ital@0;1&family=Mukta:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,30 @@
+---
+interface Item { slug: string; title: string; }
+interface Props {
+  prev?: Item;
+  next?: Item;
+}
+const { prev, next } = Astro.props;
+---
+{
+  (prev || next) && (
+    <nav class="prevnext" aria-label="और रचनाएँ">
+      {prev ? (
+        <a class="prev" href={`/poems/${prev.slug}`}>
+          <span class="pn-dir" lang="hi">पिछली</span>
+          <span lang="hi">{prev.title}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+      {next ? (
+        <a class="next" href={`/poems/${next.slug}`}>
+          <span class="pn-dir" lang="hi">अगली</span>
+          <span lang="hi">{next.title}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+    </nav>
+  )
+}

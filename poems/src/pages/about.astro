@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { POET } from '../lib/poems';
+---
+<BaseLayout title={`परिचय — ${POET.name}`} description={`${POET.name} का परिचय।`}>
+  <section class="about wrap">
+    <h1 lang="hi">परिचय</h1>
+
+    <div class="reading">
+      {/*
+        {{ PORTRAIT }} — replace the placeholder with a real photo:
+        drop the image in /public/ (e.g. about-portrait.jpg) and use:
+        <img class="about-portrait" src="/about-portrait.jpg" alt="डॉ. प्रणव गौतम" />
+      */}
+      <div class="about-portrait about-portrait--placeholder" aria-hidden="true">
+        फ़ोटो यहाँ<br />{'{{ PORTRAIT }}'}
+      </div>
+
+      <div class="about-body" lang="hi">
+        {/* {{ BIO }} — replace the placeholder paragraphs below with
+            Dr. Gautam's real background and the story behind his writing. */}
+        <p>
+          डॉ. प्रणव गौतम राजकीय आयुर्वेदिक महाविद्यालय एवं चिकित्सालय, बरेली में
+          चिकित्सक हैं। दिन में रोगियों की सेवा और शेष समय में शब्दों की साधना —
+          यही उनकी दिनचर्या है।
+        </p>
+        <p>
+          उनकी रचनाओं में कहीं प्रेम की कोमलता है, कहीं समय से संवाद, और कहीं उस
+          मौन पर प्रश्न जो हमारे आसपास पसरा रहता है। ग़ज़ल हो या गीत — वे सहज,
+          ईमानदार और अपनी ज़मीन से जुड़े हुए हैं।
+        </p>
+        <p class="about-affil">
+          {/* This is placeholder text — replace with the real परिचय. */}
+          राजकीय आयुर्वेदिक महाविद्यालय एवं चिकित्सालय, बरेली
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

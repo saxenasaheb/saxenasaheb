@@ -1,0 +1,17 @@
+---
+// Unobtrusive native audio player. Renders nothing if no src is given.
+interface Props {
+  src?: string;
+}
+const { src } = Astro.props;
+---
+{
+  src && (
+    <div class="audio">
+      <p class="audio-label" lang="hi">सुनिए — आवाज़ में</p>
+      <audio controls preload="none" src={src}>
+        आपका ब्राउज़र ऑडियो प्लेयर का समर्थन नहीं करता।
+      </audio>
+    </div>
+  )
+}

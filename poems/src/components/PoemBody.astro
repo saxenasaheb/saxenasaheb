@@ -1,0 +1,28 @@
+---
+// Faithful verse rendering. The raw poem body is split into stanzas on
+// blank lines, and every source line becomes its own <span class="line">,
+// so line breaks are preserved EXACTLY as written. Stanza gaps and
+// hanging indents for wrapped lines are handled in global.css (.verse).
+interface Props {
+  body: string;
+}
+const { body } = Astro.props;
+
+const stanzas = body
+  .replace(/\r\n/g, '\n')
+  .replace(/\n{3,}/g, '\n\n') // collapse runs of blank lines to one gap
+  .trim()
+  .split(/\n\s*\n/)
+  .map((stanza) => stanza.split('\n'));
+---
+<div class="verse" lang="hi">
+  {
+    stanzas.map((lines) => (
+      <p class="stanza">
+        {lines.map((line) => (
+          <span class="line">{line.trim() === '' ? ' ' : line}</span>
+        ))}
+      </p>
+    ))
+  }
+</div>

@@ -1,0 +1,21 @@
+---
+import { firstLine, type Poem } from '../lib/poems';
+interface Props { poems: Poem[]; }
+const { poems } = Astro.props;
+---
+{
+  poems.length === 0 ? (
+    <p class="empty-note" lang="hi">अभी कोई रचना यहाँ नहीं जोड़ी गई है।</p>
+  ) : (
+    <ul class="poem-index">
+      {poems.map((p) => (
+        <li>
+          <a href={`/poems/${p.id}`}>
+            <span class="pi-title" lang="hi">{p.data.title}</span>
+            <span class="pi-first" lang="hi">{firstLine(p.body ?? '')}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}

@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getSortedPoems, opening, POET } from '../lib/poems';
+
+const all = await getSortedPoems();
+const featured = all.find((p) => p.data.featured) ?? all[0];
+const couplet = featured ? opening(featured.body ?? '', 2) : [];
+---
+<BaseLayout title={`${POET.name} — कविताएँ एवं ग़ज़लें`}>
+  <section class="home wrap">
+    {/*
+      {{ PORTRAIT }} — replace the placeholder below with a real photo:
+      drop the image in /public/ (e.g. portrait.jpg) and use:
+      <img class="home-portrait" src="/portrait.jpg" alt="डॉ. प्रणव गौतम" />
+    */}
+    <div class="home-portrait home-portrait--placeholder" aria-hidden="true" lang="hi">प्र</div>
+
+    <h1 class="home-name" lang="hi">डॉ. प्रणव गौतम</h1>
+    <p class="home-tagline" lang="hi">
+      कविताएँ एवं ग़ज़लें — शब्दों में बुने हुए कुछ भाव, कुछ प्रश्न, कुछ मौन।
+    </p>
+
+    {
+      featured && couplet.length > 0 && (
+        <blockquote class="featured-couplet" lang="hi">
+          {couplet.map((line) => (
+            <span class="line">{line}</span>
+          ))}
+          <cite>
+            <a href={`/poems/${featured.id}`}>— {featured.data.title}</a>
+          </cite>
+        </blockquote>
+      )
+    }
+
+    <nav class="home-links" aria-label="संग्रह">
+      <a href="/kavitayein" lang="hi">कविताएँ</a>
+      <a href="/ghazalein" lang="hi">ग़ज़लें</a>
+      <a href="/about" lang="hi">परिचय</a>
+    </nav>
+  </section>
+</BaseLayout>

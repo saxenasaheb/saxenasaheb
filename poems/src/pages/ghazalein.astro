@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PoemList from '../components/PoemList.astro';
+import { getSortedPoems } from '../lib/poems';
+
+const poems = await getSortedPoems('ghazal');
+---
+<BaseLayout
+  title="ग़ज़लें — डॉ. प्रणव गौतम"
+  description="डॉ. प्रणव गौतम की ग़ज़लें।"
+>
+  <div class="wrap">
+    <div class="page-head">
+      <h1 lang="hi">ग़ज़लें</h1>
+      <p lang="hi">{poems.length} रचनाएँ</p>
+      <hr class="rule" />
+    </div>
+    <PoemList poems={poems} />
+  </div>
+</BaseLayout>
