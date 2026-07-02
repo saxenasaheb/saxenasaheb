@@ -59,39 +59,36 @@ export async function POST(req) {
     );
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.OPENAI_API_KEY) {
     return Response.json(
-      { error: "Server is missing ANTHROPIC_API_KEY." },
+      { error: "Server is missing OPENAI_API_KEY." },
       { status: 500 }
     );
   }
 
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
+        authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model: "gpt-4o-mini",
         max_tokens: 800,
+        response_format: { type: "json_object" },
         messages: [{ role: "user", content: ENGINE_PROMPT(question) }],
       }),
     });
 
     if (!res.ok) {
       const detail = await res.text();
-      console.error("Anthropic API error:", res.status, detail.slice(0, 300));
+      console.error("OpenAI API error:", res.status, detail.slice(0, 300));
       return Response.json({ error: "Engine unavailable" }, { status: 502 });
     }
 
     const data = await res.json();
-    const text = (data.content || [])
-      .filter((b) => b.type === "text")
-      .map((b) => b.text)
-      .join("\n");
+    const text = data.choices?.[0]?.message?.content || "";
 
     const parsed = extractJson(text.replace(/```json|```/g, ""));
     if (
